@@ -9,7 +9,6 @@ from telebot import types
 from typing import Dict
 from datetime import date
 
-
 User_dict = dict()
 bot = telebot.TeleBot('')
 
