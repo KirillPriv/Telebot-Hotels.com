@@ -32,7 +32,8 @@ def get_city(message: telebot.types.Message) -> None:
     """Функция, котороя по названию города делает запрос на API и передает
     полученный результат destinationId в функцию get_hotel_info()"""
     try:
-        if message.text.isalpha():
+        if message.text.isalpha() or len(message.text.split()) == 2 and message.text.split()[0].isalpha() \
+                and message.text.split()[1].isalpha():
             User_dict[message.chat.id] = {'city': message.text}
             url = 'https://hotels4.p.rapidapi.com/locations/v2/search'
             querystring = {'query': message.text,
