@@ -300,5 +300,5 @@ def write_history(i_hotel: Dict, message: telebot.types.Message,total_price:floa
         history_file.write('адрес: {adress}\n'.format(adress=i_hotel['address']['streetAddress']))
         history_file.write('растояние от центра: {distance}\n'.format(distance=i_hotel['landmarks'][0]['distance']))
         history_file.write('общая стоимость путёвки: {total_price}\n'.format(total_price=int(total_price)))
-        history_file.write('цена за одну ночь: {price}\n'.format(price=i_hotel['ratePlan']['price']['current']))
+        history_file.write('цена за одну ночь: ${price}\n'.format(price=i_hotel['ratePlan']['price']['current']))
         history_file.write('ссылка на отель: https://ru.hotels.com/ho{hotel_id}\n'.format(hotel_id=i_hotel['id']))
