@@ -89,18 +89,18 @@ def callback_worker(call) -> None:
 
     if call.data == "yes":
         if User_dict[call.message.chat.id]['command'] == '/lowprice':
-            lowprice.get_quantity_foto(call.message)
+            lowprice.get_quantity_foto(call.message, bot)
         elif User_dict[call.message.chat.id]['command'] == '/highprice':
-            highprice.get_quantity_foto(call.message)
+            highprice.get_quantity_foto(call.message, bot)
         elif User_dict[call.message.chat.id]['command'] == '/bestdeal':
-            bestdeal.get_quantity_foto(call.message)
+            bestdeal.get_quantity_foto(call.message, bot)
     else:
         if User_dict[call.message.chat.id]['command'] == '/lowprice':
-            lowprice.get_city_price_none_foto(call.message)
+            lowprice.get_city_price_none_foto(call.message, bot)
         elif User_dict[call.message.chat.id]['command'] == '/highprice':
-            highprice.get_city_price_none_foto(call.message)
+            highprice.get_city_price_none_foto(call.message, bot)
         elif User_dict[call.message.chat.id]['command'] == '/bestdeal':
-            bestdeal.get_city_price_none_foto(call.message)
+            bestdeal.get_city_price_none_foto(call.message, bot)
 
 
 bot.polling(none_stop=True, interval=0)
