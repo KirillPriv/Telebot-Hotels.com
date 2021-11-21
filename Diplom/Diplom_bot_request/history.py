@@ -1,11 +1,9 @@
-
 import telebot
-
 
 bot = telebot.TeleBot('')
 
-def get_history(current_bot: telebot, message: telebot.types.Message) -> None:
 
+def get_history(current_bot: telebot, message: telebot.types.Message) -> None:
     """Основная функция которая выолняет вывод истории запросов пользователя
     из файла history {chat_id}.txt в чат бота"""
 
@@ -18,5 +16,3 @@ def get_history(current_bot: telebot, message: telebot.types.Message) -> None:
                              format(history=history.read()))
     except FileNotFoundError:
         bot.send_message(message.chat.id, 'История запросов пока пуста. Попробуйте позже')
-
-

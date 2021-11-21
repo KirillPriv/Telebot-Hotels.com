@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 import telebot
@@ -15,9 +16,9 @@ bot = telebot.TeleBot(BOT_TOKEN)
 
 User_dict = dict()
 
+
 @bot.message_handler(content_types=['text'])
 def get_start_message(message: telebot.types.Message) -> None:
-
     """Стартовая функция. Выыодит список комананд, и делает запрос у пользователя какую команду вывести"""
     if message.text == '/start':
         bot.send_message(message.from_user.id, "Привет, я твой помощник в поиске подходящего отеля\n"
@@ -33,8 +34,7 @@ def get_start_message(message: telebot.types.Message) -> None:
         bot.register_next_step_handler(message, get_comannd_message)
 
 
-def get_comannd_message(message:telebot.types.Message) -> None:
-
+def get_comannd_message(message: telebot.types.Message) -> None:
     """Функция осуществляет работу команд в зависмости от выбора пользователя.
     Записывает в файл history {chat_id}.txt дату и время ввода выбранной команды, а также
     передает в функцию start_search() bot и message"""
@@ -42,23 +42,23 @@ def get_comannd_message(message:telebot.types.Message) -> None:
     global User_dict
     if message.text == '/help':
         User_dict[message.chat.id] = message.text
-        bot.send_message(message.from_user.id,'Чтобы начать работу бота напишите /start\n'
-                                              'Команды, которые умеет выполнять этот бот:\n'
-                                              '\n/lowprice - команда для запуска поиска отелей с минимальными ценами, '
-                                              'начинает работу после ввода команды /start\n'
-                                              '\n/highprice - команда для запуска поиска отелей с максимальными ценами, '
-                                              'начинает работу после ввода команды /start\n'
-                                              '\n/bestdeal - команда для запуска поиска отелей '
-                                              'c лучшим предложением по заданным параметрам '
-                                              '(цена, удаленность от центра города), '
-                                              'начинает работу после ввода команды /start\n'
-                                              '\n/history - команда для вывода истории запросов пользователя, '
-                                              'начинает работу после ввода команды /start\n')
+        bot.send_message(message.from_user.id, 'Чтобы начать работу бота напишите /start\n'
+                                               'Команды, которые умеет выполнять этот бот:\n'
+                                               '\n/lowprice - команда для запуска поиска отелей с минимальными ценами, '
+                                               'начинает работу после ввода команды /start\n'
+                                               '\n/highprice - команда для запуска поиска отелей с максимальными ценами, '
+                                               'начинает работу после ввода команды /start\n'
+                                               '\n/bestdeal - команда для запуска поиска отелей '
+                                               'c лучшим предложением по заданным параметрам '
+                                               '(цена, удаленность от центра города), '
+                                               'начинает работу после ввода команды /start\n'
+                                               '\n/history - команда для вывода истории запросов пользователя, '
+                                               'начинает работу после ввода команды /start\n')
         bot.register_next_step_handler(message, get_start_message)
 
     elif message.text == '/lowprice':
         User_dict[message.chat.id] = message.text
-        with open('history {chat_id}.txt'.format(chat_id=message.chat.id),'a',encoding='utf-8') as history_file:
+        with open('history {chat_id}.txt'.format(chat_id=message.chat.id), 'a', encoding='utf-8') as history_file:
             history_file.write('\nКоманда, которую вводил пользователь:/lowprice\n')
             history_file.write('Дата и время ввода команды: {time}\n'.
                                format(time=datetime.datetime.now().replace(microsecond=0)))
@@ -66,7 +66,7 @@ def get_comannd_message(message:telebot.types.Message) -> None:
 
     elif message.text == '/highprice':
         User_dict[message.chat.id] = message.text
-        with open('history {chat_id}.txt'.format(chat_id=message.chat.id),'a',encoding='utf-8') as history_file:
+        with open('history {chat_id}.txt'.format(chat_id=message.chat.id), 'a', encoding='utf-8') as history_file:
             history_file.write('\nКоманда, которую вводил пользователь:/highprice\n')
             history_file.write('Дата и время ввода команды: {time}\n'.
                                format(time=datetime.datetime.now().replace(microsecond=0)))
@@ -87,7 +87,6 @@ def get_comannd_message(message:telebot.types.Message) -> None:
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call) -> None:
-
     """ Обработка запроса необходимости вывода фото отелей с помощью кнопок"""
 
     if call.data == "yes":
@@ -105,5 +104,5 @@ def callback_worker(call) -> None:
         elif User_dict[call.message.chat.id] == '/bestdeal':
             bestdeal.get_city_price_none_foto(call.message)
 
-bot.polling(none_stop=True, interval=0)
 
+bot.polling(none_stop=True, interval=0)
