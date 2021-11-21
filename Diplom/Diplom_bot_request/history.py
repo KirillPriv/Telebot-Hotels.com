@@ -1,13 +1,11 @@
 import telebot
 
-bot = telebot.TeleBot('')
-
 
 def get_history(current_bot: telebot, message: telebot.types.Message) -> None:
+
     """Основная функция которая выолняет вывод истории запросов пользователя
     из файла history {chat_id}.txt в чат бота"""
 
-    global bot
     bot = current_bot
 
     try:
