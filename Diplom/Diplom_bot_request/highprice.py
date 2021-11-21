@@ -19,7 +19,6 @@ def start_search(current_bot: telebot, message: telebot.types.Message) -> None:
 
     """Функция старта команды. Запрашивает у пользователя город, в котором расположен отель"""
 
-    #global bot
     bot = current_bot
     bot.send_message(message.from_user.id, 'В каком городе будем осуществлять поиск по команде /highprice\n'
                                            'Пример ввода русских городов: Moscow Russia или moscow Russia\n'
