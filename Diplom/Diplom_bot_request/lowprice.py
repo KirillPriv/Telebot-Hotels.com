@@ -24,8 +24,8 @@ def start_search(bot: telebot, message: telebot.types.Message, User_dict: Dict) 
 
 def get_city(message: telebot.types.Message, bot:telebot, User_dict: Dict) -> None:
 
-    """Функция, котороя по названию города делает запрос на API и передает
-    полученный результат destinationId в функцию get_hotel_info()"""
+    """Функция, котороя по названию города делает запрос на API и записывает
+    полученный результат destinationId в User_dict"""
 
     try:
         if message.text.isalpha() or len(message.text.split()) == 2 and message.text.split()[0].isalpha() \
