@@ -9,37 +9,33 @@ from telebot import types
 from typing import Dict
 from datetime import date
 
-User_dict = dict()
-
 KEY_GET_HOTELS = os.getenv('KEY_GET_HOTELS')
 KEY_GET_HOTELS_INFO = os.getenv('KEY_GET_HOTELS_INFO')
 KEY_GET_HOTELS_FOTO = os.getenv('KEY_GET_HOTELS_FOTO')
 
-def start_search(current_bot: telebot, message: telebot.types.Message) -> None:
+def start_search(bot: telebot, message: telebot.types.Message, User_dict: Dict) -> None:
 
     """Функция старта команды. Запрашивает у пользователя город, в котором расположен отель"""
 
-    bot = current_bot
     bot.send_message(message.from_user.id, 'В каком городе будем осуществлять поиск по команде /lowprice\n'
                                            'Пример ввода русских городов: Moscow Russia или moscow Russia\n'
                                            'Пример ввода иностранных городов: London или london')
-    bot.register_next_step_handler(message, get_city, current_bot)
+    bot.register_next_step_handler(message, get_city, bot, User_dict)
 
-def get_city(message: telebot.types.Message,current_bot:telebot) -> None:
+def get_city(message: telebot.types.Message, bot:telebot, User_dict: Dict) -> None:
 
     """Функция, котороя по названию города делает запрос на API и передает
     полученный результат destinationId в функцию get_hotel_info()"""
 
-    bot = current_bot
     try:
         if message.text.isalpha() or len(message.text.split()) == 2 and message.text.split()[0].isalpha() \
                 and message.text.split()[1].isalpha():
-            User_dict[message.chat.id] = {'city': message.text}
+            User_dict[message.chat.id]['city'] = message.text
             url = 'https://hotels4.p.rapidapi.com/locations/v2/search'
             querystring = {'query': message.text,
-                             'locale': 'en_US',
-                             'currency': 'USD'
-                             }
+                           'locale': 'en_US',
+                           'currency': 'USD'
+                           }
 
             headers = {
                 'x-rapidapi-host': 'hotels4.p.rapidapi.com',
@@ -53,29 +49,27 @@ def get_city(message: telebot.types.Message,current_bot:telebot) -> None:
                 hotel_destinationId = dict_hotels_id['suggestions'][0]['entities'][0]['destinationId']
                 User_dict[message.chat.id]['hotel_destinationId'] = hotel_destinationId
 
-                chekIn_hotel(message, current_bot)
+                chekIn_hotel(message, bot, User_dict)
             else:
                 raise
         else:
             raise
     except:
         bot.send_message(message.from_user.id, 'Город введен неверно, введите город согласно интрукции')
-        bot.register_next_step_handler(message, get_city, current_bot)
+        bot.register_next_step_handler(message, get_city, bot, User_dict)
 
-def chekIn_hotel(message:telebot.types.Message, current_bot:telebot) -> None:
+def chekIn_hotel(message:telebot.types.Message, bot:telebot, User_dict: Dict) -> None:
 
     """Функция, котороя запрашивает у пользователя дату заезда в отель"""
 
-    bot = current_bot
     bot.send_message(message.from_user.id, 'Введите дату заезда в отель через (-)\n'
                                            'Пример ввода даты: 20-11-2021')
-    bot.register_next_step_handler(message, chekOut_hotel, current_bot)
+    bot.register_next_step_handler(message, chekOut_hotel, bot, User_dict)
 
-def chekOut_hotel(message:telebot.types.Message, current_bot:telebot) -> None:
+def chekOut_hotel(message:telebot.types.Message, bot:telebot, User_dict: Dict) -> None:
 
     """Функция, котороя запрашивает у пользователя дату выезда из отеля"""
 
-    bot = current_bot
     try:
         if len(message.text.split('-')) == 3 and 0 < int(message.text.split('-')[0]) <= 31 \
                 and 0 < int(message.text.split('-')[1]) <= 12 and 0 < int(message.text.split('-')[2]) >= 2021:
@@ -83,19 +77,18 @@ def chekOut_hotel(message:telebot.types.Message, current_bot:telebot) -> None:
             User_dict[message.chat.id]['chekIn'] = message.text
             bot.send_message(message.from_user.id, 'Введите дату выезда из отеля через (-)\n'
                                                    'Пример ввода даты: 28-11-2021')
-            bot.register_next_step_handler(message, period_of_stay_hotel,current_bot)
+            bot.register_next_step_handler(message, period_of_stay_hotel, bot, User_dict)
         else:
             raise
     except:
         bot.send_message(message.from_user.id, 'Дата введена некоректно, введите дату согласно интрукции')
-        bot.register_next_step_handler(message, chekOut_hotel,current_bot)
+        bot.register_next_step_handler(message, chekOut_hotel, bot, User_dict)
 
 
-def period_of_stay_hotel(message:telebot.types.Message, current_bot:telebot) -> None:
+def period_of_stay_hotel(message:telebot.types.Message, bot:telebot,User_dict: Dict) -> None:
 
     """Функция, котороя подсчитывает количесвто дней, которые пользователь проведет в отеле"""
 
-    bot = current_bot
     try:
         if len(message.text.split('-')) == 3 and 0 < int(message.text.split('-')[0]) <= 31 \
                 and 0 < int(message.text.split('-')[1]) <= 12 and 0 < int(message.text.split('-')[2]) >= 2021:
@@ -108,15 +101,14 @@ def period_of_stay_hotel(message:telebot.types.Message, current_bot:telebot) -> 
                              date(int(date_chekIn[2]), int(date_chekIn[1]), int(date_chekIn[0]))
 
             User_dict[message.chat.id]['period_of_stay'] = period_of_stay.days
-            get_hotel_info(message, current_bot)
+            get_hotel_info(message, bot, User_dict)
         else:
             raise
     except:
         bot.send_message(message.from_user.id, 'Дата введена некоректно, введите дату согласно интрукции')
-        bot.register_next_step_handler(message, period_of_stay_hotel, current_bot)
+        bot.register_next_step_handler(message, period_of_stay_hotel, bot, User_dict)
 
-
-def get_hotel_info(message:telebot.types.Message, current_bot:telebot) -> None:
+def get_hotel_info(message:telebot.types.Message, bot:telebot, User_dict) -> None:
 
     """Функция, котороя по destinationId запрашивает на API инфомрацию по отелям
     и передает полученный результат в виде словаря hotels_dict в функцию get_number_city()"""
@@ -142,30 +134,30 @@ def get_hotel_info(message:telebot.types.Message, current_bot:telebot) -> None:
     hotels = json.loads(req_hotels.text)
     hotels_dict = hotels['data']['body']['searchResults']['results']
 
-    get_number_city(message, hotels_dict, current_bot)
+    get_number_city(message, hotels_dict, bot, User_dict)
 
 
-def get_number_city(message:telebot.types.Message, hotels_dict: Dict, current_bot:telebot) -> None:
+def get_number_city(message:telebot.types.Message, hotels_dict: Dict, bot:telebot, User_dict: Dict) -> None:
 
     """Функция, котороя запрашивает у пользователя количество отелей,
     которое необходимо вывести в чат"""
 
-    bot = current_bot
     User_dict[message.chat.id]['hotels'] = hotels_dict
     bot.send_message(message.from_user.id,'Сколько вывести отелей с минимальными ценами в городе {city}\n'
                                           'Примечание: Количество отелей не должно быть больше 25'.
                      format(city=User_dict[message.chat.id]['city']))
-    bot.register_next_step_handler(message, get_foto, current_bot)
+    bot.register_next_step_handler(message, get_foto, bot, User_dict)
 
 
-def get_foto(message:telebot.types.Message, current_bot:telebot) -> None:
+def get_foto(message:telebot.types.Message, bot:telebot, User_dict: Dict) -> None:
 
     """Функция, котороя запрашивает у пользователя нужно ли выводить фотографии отелей"""
 
-    bot = current_bot
     try:
         if message.text.isalnum() and int(message.text) <= 25:
             User_dict[message.chat.id]['hotels_number'] = message.text
+            with open('User_dict {chat_id}.json'.format(chat_id=message.chat.id), 'w') as file:
+                json.dump(User_dict, file, indent=4)
             keyboard = types.InlineKeyboardMarkup()
             keyboard.add(types.InlineKeyboardButton(text='Да', callback_data='yes'))
             keyboard.add(types.InlineKeyboardButton(text='Нет', callback_data='no'))
@@ -177,25 +169,23 @@ def get_foto(message:telebot.types.Message, current_bot:telebot) -> None:
         bot.send_message(message.from_user.id, 'Введенно некорректное значение, '
                                                'либо введенное значение привышает 25\n'
                                                'Введите значение согласно интрукции (кол-во <= 25)')
-        bot.register_next_step_handler(message, get_foto, current_bot)
+        bot.register_next_step_handler(message, get_foto, bot, User_dict)
 
-def get_quantity_foto(message: telebot.types.Message, current_bot:telebot) -> None:
+def get_quantity_foto(message: telebot.types.Message, bot:telebot, User_dict: Dict) -> None:
 
     """Функция, котороя запрашивает у пользователя количество фотографий отелей,
     которое необходимо вывести в чат"""
 
-    bot = current_bot
     bot.send_message(message.chat.id, 'Сколько фото отелей вывести\n'
                               'Примечание: Количество фото не должно быть больше 10')
-    bot.register_next_step_handler(message, get_city_price_and_foto, current_bot)
+    bot.register_next_step_handler(message, get_city_price_and_foto, bot, User_dict)
 
-def get_city_price_and_foto(message: telebot.types.Message, current_bot:telebot) -> None:
+def get_city_price_and_foto(message: telebot.types.Message, bot:telebot, User_dict: Dict) -> None:
 
     """Основная Функция для вывода информации по выбранным отелям и фотографий к ним,
     в данной функции производится сортировка словаря по ценам, а
     также осуществляется вывод информации по отелям в чат"""
 
-    bot = current_bot
     User_dict[message.chat.id]['get_foto'] = ['yes']
     hotels_dict = User_dict[message.chat.id]['hotels']
 
@@ -253,16 +243,15 @@ def get_city_price_and_foto(message: telebot.types.Message, current_bot:telebot)
         bot.send_message(message.from_user.id, 'Введенно некорректное значение, '
                                                'либо введенное значение привышает 10\n'
                                                'Введите значение согласно интрукции (кол-во фото <= 10)')
-        bot.register_next_step_handler(message, get_city_price_and_foto, current_bot)
+        bot.register_next_step_handler(message, get_city_price_and_foto, bot, User_dict)
 
 
-def get_city_price_none_foto(message: telebot.types.Message, current_bot:telebot) -> None:
+def get_city_price_none_foto(message: telebot.types.Message, bot:telebot, User_dict: Dict) -> None:
 
     """Основная Функция для вывода информации по выбранным отелям без фотографий,
        в данной функции производится сортировка словаря по ценам, а
        также осуществляется вывод информации по отелям в чат"""
 
-    bot = current_bot
     User_dict[message.chat.id]['get_foto'] = ['no']
     hotels_dict = User_dict[message.chat.id]['hotels']
 
