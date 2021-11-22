@@ -5,6 +5,7 @@ load_dotenv()
 
 import telebot
 import datetime
+import json
 
 from Diplom_bot_request import lowprice
 from Diplom_bot_request import highprice
@@ -14,7 +15,6 @@ from Diplom_bot_request import history
 BOT_TOKEN = os.getenv('BOT_Token')
 bot = telebot.TeleBot(BOT_TOKEN)
 
-User_dict = dict()
 
 @bot.message_handler(content_types=['text'])
 def get_start_message(message: telebot.types.Message) -> None:
@@ -38,6 +38,8 @@ def get_comannd_message(message: telebot.types.Message) -> None:
     Записывает в файл history {chat_id}.txt дату и время ввода выбранной команды, а также
     передает в функцию start_search() bot и message"""
 
+    User_dict = dict()
+
     if message.text == '/help':
         User_dict[message.chat.id] = {'command': message.text}
         bot.send_message(message.from_user.id, 'Чтобы начать работу бота напишите /start\n'
@@ -60,7 +62,7 @@ def get_comannd_message(message: telebot.types.Message) -> None:
             history_file.write('\nКоманда, которую вводил пользователь:/lowprice\n')
             history_file.write('Дата и время ввода команды: {time}\n'.
                                format(time=datetime.datetime.now().replace(microsecond=0)))
-        lowprice.start_search(bot, message)
+        lowprice.start_search(bot, message, User_dict)
 
     elif message.text == '/highprice':
         User_dict[message.chat.id] = {'command': message.text}
@@ -68,7 +70,7 @@ def get_comannd_message(message: telebot.types.Message) -> None:
             history_file.write('\nКоманда, которую вводил пользователь:/highprice\n')
             history_file.write('Дата и время ввода команды: {time}\n'.
                                format(time=datetime.datetime.now().replace(microsecond=0)))
-        highprice.start_search(bot, message)
+        highprice.start_search(bot, message, User_dict)
 
     elif message.text == '/bestdeal':
         User_dict[message.chat.id] = {'command': message.text}
@@ -76,7 +78,7 @@ def get_comannd_message(message: telebot.types.Message) -> None:
             history_file.write('\nКоманда, которую вводил пользователь:/bestdeal\n')
             history_file.write('Дата и время ввода команды: {time}\n'.
                                format(time=datetime.datetime.now().replace(microsecond=0)))
-        bestdeal.start_search(bot, message)
+        bestdeal.start_search(bot, message, User_dict)
 
     elif message.text == '/history':
         User_dict[message.chat.id] = {'command': message.text}
@@ -87,20 +89,25 @@ def get_comannd_message(message: telebot.types.Message) -> None:
 def callback_worker(call) -> None:
     """ Обработка запроса необходимости вывода фото отелей с помощью кнопок"""
 
+    with open('User_dict {chat_id}.json'.format(chat_id=call.message.chat.id), 'r') as file:
+        User_dict = json.loads(file.read())
+
+    User_dict = {int(key): dict for key, dict in User_dict.items()}
+
     if call.data == "yes":
         if User_dict[call.message.chat.id]['command'] == '/lowprice':
-            lowprice.get_quantity_foto(call.message, bot)
+            lowprice.get_quantity_foto(call.message, bot, User_dict)
         elif User_dict[call.message.chat.id]['command'] == '/highprice':
-            highprice.get_quantity_foto(call.message, bot)
+            highprice.get_quantity_foto(call.message, bot, User_dict)
         elif User_dict[call.message.chat.id]['command'] == '/bestdeal':
-            bestdeal.get_quantity_foto(call.message, bot)
+            bestdeal.get_quantity_foto(call.message, bot, User_dict)
     else:
         if User_dict[call.message.chat.id]['command'] == '/lowprice':
-            lowprice.get_city_price_none_foto(call.message, bot)
+            lowprice.get_city_price_none_foto(call.message, bot, User_dict)
         elif User_dict[call.message.chat.id]['command'] == '/highprice':
-            highprice.get_city_price_none_foto(call.message, bot)
+            highprice.get_city_price_none_foto(call.message, bot, User_dict)
         elif User_dict[call.message.chat.id]['command'] == '/bestdeal':
-            bestdeal.get_city_price_none_foto(call.message, bot)
+            bestdeal.get_city_price_none_foto(call.message, bot, User_dict)
 
 
 bot.polling(none_stop=True, interval=0)
