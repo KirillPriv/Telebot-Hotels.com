@@ -1,14 +1,15 @@
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 import json
 import requests
 import time
 import telebot
+
+from datetime import date
+from dotenv import load_dotenv
 from telebot import types
 from typing import Dict
-from datetime import date
+
+load_dotenv()
 
 KEY_GET_HOTELS = os.getenv('KEY_GET_HOTELS')
 KEY_GET_HOTELS_INFO = os.getenv('KEY_GET_HOTELS_INFO')
@@ -18,7 +19,7 @@ KEY_GET_HOTELS_FOTO = os.getenv('KEY_GET_HOTELS_FOTO')
 def start_search(bot: telebot, message: telebot.types.Message, User_dict: Dict) -> None:
     """Функция старта команды. Запрашивает у пользователя город, в котором расположен отель"""
 
-    bot.send_message(message.from_user.id, 'В каком городе будем осуществлять поиск по команде /bestdeal\n'
+    bot.send_message(message.from_user.id, 'В каком городе будем осуществлять поиск по команде /lowprice\n'
                                            'Пример ввода русских городов: Moscow Russia или moscow Russia\n'
                                            'Пример ввода иностранных городов: London или london')
     bot.register_next_step_handler(message, get_city, bot, User_dict)
@@ -109,7 +110,7 @@ def period_of_stay_hotel(message: telebot.types.Message, bot: telebot, User_dict
         bot.register_next_step_handler(message, period_of_stay_hotel, bot, User_dict)
 
 
-def get_hotel_info(message: telebot.types.Message, bot: telebot, User_dict: Dict) -> None:
+def get_hotel_info(message: telebot.types.Message, bot: telebot, User_dict) -> None:
     """Функция, котороя по destinationId запрашивает на API инфомрацию по отелям
     и передает полученный результат в виде словаря hotels_dict в функцию get_number_city()"""
 
@@ -134,56 +135,18 @@ def get_hotel_info(message: telebot.types.Message, bot: telebot, User_dict: Dict
     hotels = json.loads(req_hotels.text)
     hotels_dict = hotels['data']['body']['searchResults']['results']
 
-    get_range_price(message, hotels_dict, bot, User_dict)
+    get_number_city(message, hotels_dict, bot, User_dict)
 
 
-def get_range_price(message: telebot.types.Message, hotels_dict: Dict, bot: telebot, User_dict: Dict) -> None:
-    """Функция, котороя запрашивает у пользователя диапазон стоимости проживания,
-            по которому необходимо осуществлять поиск отелей"""
-
-    User_dict[message.chat.id]['hotels'] = hotels_dict
-    bot.send_message(message.from_user.id, 'Введите диапазон стоимости проживания через (-)\n'
-                                           'Пример ввода диапазона стоимости: 3-40')
-    bot.register_next_step_handler(message, get_range_distance, bot, User_dict)
-
-
-def get_range_distance(message: telebot.types.Message, bot: telebot, User_dict: Dict) -> None:
-    """Функция, котороя запрашивает у пользователя диапазон расстояния от центра города,
-        по которому необходимо осуществлять поиск отелей"""
-
-    try:
-        if len(message.text.split('-')) == 2 and int(message.text.split('-')[0]) <= int(message.text.split('-')[1]):
-            User_dict[message.chat.id]['range_price'] = message.text
-            bot.send_message(message.from_user.id, 'Введите диапазон расстояния от центра города через (-)\n'
-                                                   'Пример ввода расстояния от центра: 0-3')
-            bot.register_next_step_handler(message, get_number_city, bot, User_dict)
-        else:
-            raise
-    except:
-        bot.send_message(message.from_user.id, 'Введенно некорректное значение, '
-                                               'либо первое значение привышает второе веденное значение\n'
-                                               'Введите значение согласно интрукции')
-        bot.register_next_step_handler(message, get_range_distance, bot, User_dict)
-
-
-def get_number_city(message: telebot.types.Message, bot: telebot, User_dict: Dict) -> None:
+def get_number_city(message: telebot.types.Message, hotels_dict: Dict, bot: telebot, User_dict: Dict) -> None:
     """Функция, котороя запрашивает у пользователя количество отелей,
     которое необходимо вывести в чат"""
 
-    try:
-        if len(message.text.split('-')) == 2 and int(message.text.split('-')[0]) <= int(message.text.split('-')[1]):
-            User_dict[message.chat.id]['range_distance'] = message.text
-            bot.send_message(message.from_user.id, 'Сколько вывести отелей с заданными параметрами в городе {city}\n'
-                                                   'Примечание: Количество отелей не должно быть больше 25'.
-                             format(city=User_dict[message.chat.id]['city']))
-            bot.register_next_step_handler(message, get_foto, bot, User_dict)
-        else:
-            raise
-    except:
-        bot.send_message(message.from_user.id, 'Введенно некорректное значение, '
-                                               'либо первое значение привышает второе веденное значение\n'
-                                               'Введите значение согласно интрукции')
-        bot.register_next_step_handler(message, get_number_city, bot, User_dict)
+    User_dict[message.chat.id]['hotels'] = hotels_dict
+    bot.send_message(message.from_user.id, 'Сколько вывести отелей с минимальными ценами в городе {city}\n'
+                                           'Примечание: Количество отелей не должно быть больше 25'.
+                     format(city=User_dict[message.chat.id]['city']))
+    bot.register_next_step_handler(message, get_foto, bot, User_dict)
 
 
 def get_foto(message: telebot.types.Message, bot: telebot, User_dict: Dict) -> None:
@@ -219,43 +182,38 @@ def get_quantity_foto(message: telebot.types.Message, bot: telebot, User_dict: D
 
 def get_city_price_and_foto(message: telebot.types.Message, bot: telebot, User_dict: Dict) -> None:
     """Основная Функция для вывода информации по выбранным отелям и фотографий к ним,
-    в данной функции производится сортировка словаря по выбранным параметрам, а
+    в данной функции производится сортировка словаря по ценам, а
     также осуществляется вывод информации по отелям в чат"""
 
     User_dict[message.chat.id]['get_foto'] = ['yes']
     hotels_dict = User_dict[message.chat.id]['hotels']
-    range_price = User_dict[message.chat.id]['range_price'].split('-')
-    range_distance = User_dict[message.chat.id]['range_distance'].split('-')
 
     try:
         if message.text.isalnum() and int(message.text) <= 10:
-            def filter_hotel(hotels_dict):
-                if 'ratePlan' in hotels_dict:
-                    i_distance = (hotels_dict['landmarks'][0]['distance']).split()
-                    if int(range_price[0]) <= hotels_dict['ratePlan']['price']['exactCurrent'] <= int(range_price[1]) \
-                            and int(range_distance[0]) <= float(i_distance[0]) <= int(range_distance[1]):
-                        return True
+            def filter_key(hotel_dict: Dict) -> True or False:
+                """Функция фильтрации словаря по указанному ключу
+                :return True or False
+                """
+                if 'ratePlan' in hotel_dict:
+                    return True
                 else:
                     return False
 
-            hotel_dict_filter = list(filter(filter_hotel, hotels_dict))
-            if len(hotel_dict_filter) < int(User_dict[message.chat.id]['hotels_number']):
-                bot.send_message(message.chat.id, 'К сожалению по вашим параметрам, отелей нашлось '
-                                                  'всего: {range}\n'.format(range=len(hotel_dict_filter)))
-
-            hotel_dict_sorted = sorted(hotel_dict_filter, key=lambda elem: elem['ratePlan']['price']['exactCurrent'],
-                                       reverse=False)
+            hotel_dict_filter = list(filter(filter_key, hotels_dict))
+            hotel_dict_sorted = sorted(hotel_dict_filter,
+                                       key=lambda elem: elem['ratePlan']['price']['exactCurrent'], reverse=False)
 
             for i_hotel in hotel_dict_sorted[:int(User_dict[message.chat.id]['hotels_number'])]:
-                url = 'https://hotels4.p.rapidapi.com/properties/get-hotel-photos'
-                querystring = {'id': i_hotel['id'],  # конкретный id отеля
-                               }
-                headers = {
+                url_4 = 'https://hotels4.p.rapidapi.com/properties/get-hotel-photos'
+                querystring_4 = {'id': i_hotel['id'],  # конкретный id отеля
+                                 }
+
+                headers_4 = {
                     'x-rapidapi-host': 'hotels4.p.rapidapi.com',
-                    'x-rapidapi-key': KEY_GET_HOTELS_FOTO
+                    'x-rapidapi-key': 'f501d0b550msh5a8511a7c8a7732p1018bejsn79c833e7b035'
                 }
 
-                req_hotels_foto = requests.request('GET', url, headers=headers, params=querystring)
+                req_hotels_foto = requests.request('GET', url_4, headers=headers_4, params=querystring_4)
                 hotels_foto_dict = json.loads(req_hotels_foto.text)
 
                 total_price = float(User_dict[message.chat.id]['period_of_stay']) * \
@@ -280,7 +238,6 @@ def get_city_price_and_foto(message: telebot.types.Message, bot: telebot, User_d
                 write_history(i_hotel, message, total_price)
         else:
             raise
-
     except:
         bot.send_message(message.from_user.id, 'Введенно некорректное значение, '
                                                'либо введенное значение привышает 10\n'
@@ -290,30 +247,21 @@ def get_city_price_and_foto(message: telebot.types.Message, bot: telebot, User_d
 
 def get_city_price_none_foto(message: telebot.types.Message, bot: telebot, User_dict: Dict) -> None:
     """Основная Функция для вывода информации по выбранным отелям без фотографий,
-       в данной функции производится сортировка словаря по выбранным параметрам, а
+       в данной функции производится сортировка словаря по ценам, а
        также осуществляется вывод информации по отелям в чат"""
 
-    User_dict[message.chat.id]['get_foto'] = ['yes']
+    User_dict[message.chat.id]['get_foto'] = ['no']
     hotels_dict = User_dict[message.chat.id]['hotels']
-    range_price = User_dict[message.chat.id]['range_price'].split('-')
-    range_distance = User_dict[message.chat.id]['range_distance'].split('-')
 
-    def filter_hotel(hotel_dict):
+    def filter_key(hotel_dict):
         if 'ratePlan' in hotel_dict:
-            i_distance = (hotel_dict['landmarks'][0]['distance']).split()
-            if int(range_price[0]) <= hotel_dict['ratePlan']['price']['exactCurrent'] <= int(range_price[1]) \
-                    and int(range_distance[0]) <= float(i_distance[0]) <= int(range_distance[1]):
-                return True
+            return True
         else:
             return False
 
-    hotel_dict_filter = list(filter(filter_hotel, hotels_dict))
-    if len(hotel_dict_filter) < int(User_dict[message.chat.id]['hotels_number']):
-        bot.send_message(message.chat.id, 'К сожалению по вашим параметрам, отелей нашлось '
-                                          'всего: {range}\n'.format(range=len(hotel_dict_filter)))
-
-    hotel_dict_sorted = sorted(hotel_dict_filter, key=lambda elem: elem['ratePlan']['price']['exactCurrent'],
-                               reverse=False)
+    hotel_dict_filter = list(filter(filter_key, hotels_dict))
+    hotel_dict_sorted = sorted(hotel_dict_filter,
+                               key=lambda elem: elem['ratePlan']['price']['exactCurrent'], reverse=False)
 
     for i_hotel in hotel_dict_sorted[:int(User_dict[message.chat.id]['hotels_number'])]:
         total_price = float(User_dict[message.chat.id]['period_of_stay']) * \
@@ -333,6 +281,7 @@ def get_city_price_none_foto(message: telebot.types.Message, bot: telebot, User_
                                 hotel_id=i_hotel['id']))
 
         write_history(i_hotel, message, total_price)
+
 
 def write_history(i_hotel: Dict, message: telebot.types.Message, total_price: float) -> None:
     """Функция выполняет запись истории запросов  отелей пользователя в файл history {chat_id}.txt"""

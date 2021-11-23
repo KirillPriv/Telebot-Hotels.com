@@ -1,16 +1,16 @@
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-import telebot
 import datetime
 import json
+import telebot
 
-from Diplom_bot_request import lowprice
-from Diplom_bot_request import highprice
-from Diplom_bot_request import bestdeal
-from Diplom_bot_request import history
+from dotenv import load_dotenv
+
+from bot_requests import lowprice
+from bot_requests import highprice
+from bot_requests import bestdeal
+from bot_requests import history
+
+load_dotenv()
 
 BOT_TOKEN = os.getenv('BOT_Token')
 bot = telebot.TeleBot(BOT_TOKEN)

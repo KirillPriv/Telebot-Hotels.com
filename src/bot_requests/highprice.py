@@ -1,14 +1,15 @@
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 import json
 import requests
 import time
 import telebot
-from telebot import types
+
+from dotenv import load_dotenv
 from typing import Dict
+from telebot import types
 from datetime import date
+
+load_dotenv()
 
 KEY_GET_HOTELS = os.getenv('KEY_GET_HOTELS')
 KEY_GET_HOTELS_INFO = os.getenv('KEY_GET_HOTELS_INFO')
