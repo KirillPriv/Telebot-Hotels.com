@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from typing import Dict
 from telebot import types
 from datetime import date
+from telebot.types import InputMediaPhoto
 
 load_dotenv()
 
@@ -233,8 +234,9 @@ def get_city_price_and_foto(message: telebot.types.Message, bot: telebot, user_d
                                         price=i_hotel['ratePlan']['price']['current'],
                                         hotel_id=i_hotel['id']))
 
-                for i_foto_get in hotels_foto_dict['hotelImages'][:int(message.text)]:
-                    bot.send_photo(message.chat.id, i_foto_get['baseUrl'].format(size='z'))
+                media_group = [InputMediaPhoto(i_foto_get['baseUrl'].format(size='z'))
+                               for i_foto_get in hotels_foto_dict['hotelImages'][:int(message.text)]]
+                bot.send_media_group(message.chat.id, media_group)
 
                 write_history(i_hotel, message, total_price)
         else:
