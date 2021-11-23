@@ -211,7 +211,7 @@ def get_city_price_and_foto(message: telebot.types.Message, bot: telebot, User_d
 
                 headers_4 = {
                     'x-rapidapi-host': 'hotels4.p.rapidapi.com',
-                    'x-rapidapi-key': 'f501d0b550msh5a8511a7c8a7732p1018bejsn79c833e7b035'
+                    'x-rapidapi-key': KEY_GET_HOTELS_FOTO
                 }
 
                 req_hotels_foto = requests.request('GET', url_4, headers=headers_4, params=querystring_4)
