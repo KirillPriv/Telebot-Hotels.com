@@ -49,7 +49,7 @@ def get_city(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
 
             if dict_hotels_id['moresuggestions'] != 0:
                 hotel_destinationId = dict_hotels_id['suggestions'][0]['entities'][0]['destinationId']
-                User_dict[message.chat.id]['hotel_destinationId'] = hotel_destinationId
+                user_dict[message.chat.id]['hotel_destinationId'] = hotel_destinationId
 
                 chekIn_hotel(message, bot, user_dict)
             else:

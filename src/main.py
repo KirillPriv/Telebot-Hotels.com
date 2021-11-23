@@ -102,12 +102,12 @@ def callback_worker(call) -> None:
         elif user_dict[call.message.chat.id]['command'] == '/bestdeal':
             bestdeal.get_quantity_foto(call.message, bot, user_dict)
     else:
-        if User_dict[call.message.chat.id]['command'] == '/lowprice':
-            lowprice.get_city_price_none_foto(call.message, bot, User_dict)
-        elif User_dict[call.message.chat.id]['command'] == '/highprice':
-            highprice.get_city_price_none_foto(call.message, bot, User_dict)
-        elif User_dict[call.message.chat.id]['command'] == '/bestdeal':
-            bestdeal.get_city_price_none_foto(call.message, bot, User_dict)
+        if user_dict[call.message.chat.id]['command'] == '/lowprice':
+            lowprice.get_city_price_none_foto(call.message, bot, user_dict)
+        elif user_dict[call.message.chat.id]['command'] == '/highprice':
+            highprice.get_city_price_none_foto(call.message, bot, user_dict)
+        elif user_dict[call.message.chat.id]['command'] == '/bestdeal':
+            bestdeal.get_city_price_none_foto(call.message, bot, user_dict)
 
 
 bot.polling(none_stop=True, interval=0)
