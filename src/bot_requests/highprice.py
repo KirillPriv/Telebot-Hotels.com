@@ -3,6 +3,7 @@ import json
 import requests
 import time
 import telebot
+import datetime
 
 from dotenv import load_dotenv
 from typing import Dict
@@ -55,10 +56,15 @@ def get_city(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
 
                 chekIn_hotel(message, bot, user_dict)
             else:
-                raise
+                raise Exception
         else:
-            raise
-    except:
+            raise Exception
+    except Exception as ex:
+        with open('errors id{chat_id}.log'.format(chat_id=message.chat.id), 'a', encoding='utf-8') as erros_log:
+            erros_log.write('\nИмя функции: {func}\n'.format(func=get_city.__name__))
+            erros_log.write('Вызвана ошибка: {traceback}'.format(traceback=ex))
+            erros_log.write('Время ошибки: {time}\n'.format(time=datetime.datetime.now().replace(microsecond=0)))
+
         bot.send_message(message.from_user.id, 'Город введен неверно, введите город согласно интрукции')
         bot.register_next_step_handler(message, get_city, bot, user_dict)
 
@@ -83,8 +89,13 @@ def chekOut_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict)
                                                    'Пример ввода даты: 28-11-2021')
             bot.register_next_step_handler(message, period_of_stay_hotel, bot, user_dict)
         else:
-            raise
-    except:
+            raise Exception
+    except Exception as ex:
+        with open('errors id{chat_id}.log'.format(chat_id=message.chat.id), 'a', encoding='utf-8') as erros_log:
+            erros_log.write('\nИмя функции: {func}\n'.format(func=chekOut_hotel.__name__))
+            erros_log.write('Вызвана ошибка: {traceback}'.format(traceback=ex))
+            erros_log.write('Время ошибки: {time}\n'.format(time=datetime.datetime.now().replace(microsecond=0)))
+
         bot.send_message(message.from_user.id, 'Дата введена некоректно, введите дату согласно интрукции')
         bot.register_next_step_handler(message, chekOut_hotel, bot, user_dict)
 
@@ -106,8 +117,13 @@ def period_of_stay_hotel(message: telebot.types.Message, bot: telebot, user_dict
             user_dict[message.chat.id]['period_of_stay'] = period_of_stay.days
             get_hotel_info(message, bot, user_dict)
         else:
-            raise
-    except:
+            raise Exception
+    except Exception as ex:
+        with open('errors id{chat_id}.log'.format(chat_id=message.chat.id), 'a', encoding='utf-8') as erros_log:
+            erros_log.write('\nИмя функции: {func}\n'.format(func=period_of_stay_hotel.__name__))
+            erros_log.write('Вызвана ошибка: {traceback}'.format(traceback=ex))
+            erros_log.write('Время ошибки: {time}\n'.format(time=datetime.datetime.now().replace(microsecond=0)))
+
         bot.send_message(message.from_user.id, 'Дата введена некоректно, введите дату согласно интрукции')
         bot.register_next_step_handler(message, period_of_stay_hotel, bot, user_dict)
 
@@ -165,8 +181,13 @@ def get_foto(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
             question = 'Отели выводить с фото?'
             bot.send_message(message.from_user.id, text=question, reply_markup=keyboard)
         else:
-            raise
-    except:
+            raise Exception
+    except Exception as ex:
+        with open('errors id{chat_id}.log'.format(chat_id=message.chat.id), 'a', encoding='utf-8') as erros_log:
+            erros_log.write('\nИмя функции: {func}\n'.format(func=get_foto.__name__))
+            erros_log.write('Вызвана ошибка: {traceback}'.format(traceback=ex))
+            erros_log.write('Время ошибки: {time}\n'.format(time=datetime.datetime.now().replace(microsecond=0)))
+
         bot.send_message(message.from_user.id, 'Введенно некорректное значение, '
                                                'либо введенное значение привышает 25\n'
                                                'Введите значение согласно интрукции (кол-во <= 25)')
@@ -240,8 +261,13 @@ def get_city_price_and_foto(message: telebot.types.Message, bot: telebot, user_d
 
                 write_history(i_hotel, message, total_price)
         else:
-            raise
-    except:
+            raise Exception
+    except Exception as ex:
+        with open('errors id{chat_id}.log'.format(chat_id=message.chat.id), 'a', encoding='utf-8') as erros_log:
+            erros_log.write('\nИмя функции: {func}\n'.format(func=get_city_price_and_foto.__name__))
+            erros_log.write('Вызвана ошибка: {traceback}'.format(traceback=ex))
+            erros_log.write('Время ошибки: {time}\n'.format(time=datetime.datetime.now().replace(microsecond=0)))
+
         bot.send_message(message.from_user.id, 'Введенно некорректное значение, '
                                                'либо введенное значение привышает 10\n'
                                                'Введите значение согласно интрукции (кол-во фото <= 10)')
