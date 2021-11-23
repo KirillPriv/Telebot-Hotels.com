@@ -109,5 +109,4 @@ def callback_worker(call) -> None:
         elif user_dict[call.message.chat.id]['command'] == '/bestdeal':
             bestdeal.get_city_price_none_foto(call.message, bot, user_dict)
 
-
 bot.polling(none_stop=True, interval=0)
