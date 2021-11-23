@@ -97,10 +97,10 @@ def period_of_stay_hotel(message: telebot.types.Message, bot: telebot, User_dict
 
             User_dict[message.chat.id]['chekOut'] = message.text
 
-            date_chekIn = User_dict[message.chat.id]['chekIn'].split('-')
-            date_chekOut = User_dict[message.chat.id]['chekOut'].split('-')
-            period_of_stay = date(int(date_chekOut[2]), int(date_chekOut[1]), int(date_chekOut[0])) - \
-                             date(int(date_chekIn[2]), int(date_chekIn[1]), int(date_chekIn[0]))
+            date_chek_in = User_dict[message.chat.id]['chekIn'].split('-')
+            date_chek_out = User_dict[message.chat.id]['chekOut'].split('-')
+            period_of_stay = date(int(date_chek_out[2]), int(date_chek_out[1]), int(date_chek_out[0])) - \
+                             date(int(date_chek_in[2]), int(date_chek_in[1]), int(date_chek_in[0]))
 
             User_dict[message.chat.id]['period_of_stay'] = period_of_stay.days
             get_hotel_info(message, bot, User_dict)
