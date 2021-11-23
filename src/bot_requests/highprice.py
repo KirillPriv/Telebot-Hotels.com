@@ -232,7 +232,7 @@ def get_city_price_and_foto(message: telebot.types.Message, bot: telebot, user_d
                                         distance_center=i_hotel['landmarks'][0]['distance'],
                                         total_price=int(total_price),
                                         price=i_hotel['ratePlan']['price']['current'],
-                                        hotel_id=i_hotel['id']))
+                                        hotel_id=i_hotel['id']), disable_web_page_preview=True)
 
                 media_group = [InputMediaPhoto(i_foto_get['baseUrl'].format(size='z'))
                                for i_foto_get in hotels_foto_dict['hotelImages'][:int(message.text)]]
@@ -281,7 +281,7 @@ def get_city_price_none_foto(message: telebot.types.Message, bot: telebot, user_
                                 distance_center=i_hotel['landmarks'][0]['distance'],
                                 total_price=int(total_price),
                                 price=i_hotel['ratePlan']['price']['current'],
-                                hotel_id=i_hotel['id']))
+                                hotel_id=i_hotel['id']), disable_web_page_preview=True)
 
         write_history(i_hotel, message, total_price)
 
