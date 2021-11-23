@@ -125,3 +125,4 @@ venv.bak/
 dmypy.json
 /src/Practice/
 /src/bot_requests/__init__.py
+/Practice
