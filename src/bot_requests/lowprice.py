@@ -61,7 +61,8 @@ def get_city(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
     except Exception as ex:
         logger.add('errors id{chat_id}.log'.format(chat_id=message.chat.id), level='DEBUG',
                    format='{time} {level} {message}', rotation='9:00', compression='zip')
-        logger.debug('Name func: {func} error name: {ex}'.format(func=get_city.__name__, ex=ex))
+        logger.debug('Command: {command} Name func: {func} error name: {ex}'.
+                     format(command=user_dict[message.chat.id]['command'], func=get_city.__name__, ex=ex))
 
         bot.send_message(message.from_user.id, 'Город введен неверно, введите город согласно интрукции')
         bot.register_next_step_handler(message, get_city, bot, user_dict)
@@ -91,7 +92,8 @@ def chekOut_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict)
     except Exception as ex:
         logger.add('errors id{chat_id}.log'.format(chat_id=message.chat.id), level='DEBUG',
                    format='{time} {level} {message}', rotation='9:00', compression='zip')
-        logger.debug('Name func: {func} error name: {ex}'.format(func=chekOut_hotel.__name__, ex=ex))
+        logger.debug('Command: {command} Name func: {func} error name: {ex}'.
+                     format(command=user_dict[message.chat.id]['command'], func=chekOut_hotel.__name__, ex=ex))
 
         bot.send_message(message.from_user.id, 'Дата введена некоректно, введите дату согласно интрукции')
         bot.register_next_step_handler(message, chekOut_hotel, bot, user_dict)
@@ -118,7 +120,8 @@ def period_of_stay_hotel(message: telebot.types.Message, bot: telebot, user_dict
     except Exception as ex:
         logger.add('errors id{chat_id}.log'.format(chat_id=message.chat.id), level='DEBUG',
                    format='{time} {level} {message}', rotation='9:00', compression='zip')
-        logger.debug('Name func: {func} error name: {ex}'.format(func=period_of_stay_hotel.__name__, ex=ex))
+        logger.debug('Command: {command} Name func: {func} error name: {ex}'.
+                     format(command=user_dict[message.chat.id]['command'], func=period_of_stay_hotel.__name__, ex=ex))
 
         bot.send_message(message.from_user.id, 'Дата введена некоректно, введите дату согласно интрукции')
         bot.register_next_step_handler(message, period_of_stay_hotel, bot, user_dict)
@@ -181,7 +184,8 @@ def get_foto(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
     except Exception as ex:
         logger.add('errors id{chat_id}.log'.format(chat_id=message.chat.id), level='DEBUG',
                    format='{time} {level} {message}', rotation='9:00', compression='zip')
-        logger.debug('Name func: {func} error name: {ex}'.format(func=get_foto.__name__, ex=ex))
+        logger.debug('Command: {command} Name func: {func} error name: {ex}'.
+                     format(command=user_dict[message.chat.id]['command'], func=get_foto.__name__, ex=ex))
 
         bot.send_message(message.from_user.id, 'Введенно некорректное значение, '
                                                'либо введенное значение привышает 25\n'
@@ -260,7 +264,9 @@ def get_city_price_and_foto(message: telebot.types.Message, bot: telebot, user_d
     except Exception as ex:
         logger.add('errors id{chat_id}.log'.format(chat_id=message.chat.id), level='DEBUG',
                    format='{time} {level} {message}', rotation='9:00', compression='zip')
-        logger.debug('Name func: {func} error name: {ex}'.format(func=get_city_price_and_foto.__name__, ex=ex))
+        logger.debug('Command: {command} Name func: {func} error name: {ex}'.
+                     format(command=user_dict[message.chat.id]['command'],
+                            func=get_city_price_and_foto.__name__, ex=ex))
 
         bot.send_message(message.from_user.id, 'Введенно некорректное значение, '
                                                'либо введенное значение привышает 10\n'
