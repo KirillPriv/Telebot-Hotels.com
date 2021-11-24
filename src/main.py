@@ -19,7 +19,7 @@ bot = telebot.TeleBot(BOT_TOKEN)
 @bot.message_handler(content_types=['text'])
 def get_start_message(message: telebot.types.Message) -> None:
     """Стартовая функция. Выыодит список комананд, и делает запрос у пользователя какую команду вывести"""
-    if message.text == '/start':
+    if message.text == '/start' or message.text == 'Привет' or message.text == 'привет' or message.text == 'Hello word':
         bot.send_message(message.from_user.id, "Привет, я твой помощник в поиске подходящего отеля\n"
                                                "Для начала работы напиши одну из команд:\n"
                                                "/help - вывод меню помощи\n"
