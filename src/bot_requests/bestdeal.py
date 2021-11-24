@@ -9,7 +9,8 @@ from dotenv import load_dotenv
 from typing import Dict
 from telebot import types
 from telebot.types import InputMediaPhoto
-from loguru import logger
+
+from src.settings import logger
 
 load_dotenv()
 
@@ -59,8 +60,6 @@ def get_city(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
         else:
             raise Exception
     except Exception as ex:
-        logger.add('errors id{chat_id}.log'.format(chat_id=message.chat.id), level='DEBUG',
-                   format='{time} {level} {message}', rotation='9:00', compression='zip')
         logger.debug('Command: {command} Name func: {func} error name: {ex}'.
                      format(command=user_dict[message.chat.id]['command'], func=get_city.__name__, ex=ex))
 
@@ -90,8 +89,6 @@ def chekOut_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict)
         else:
             raise Exception('date chekIn_hotel Error')
     except Exception as ex:
-        logger.add('errors id{chat_id}.log'.format(chat_id=message.chat.id), level='DEBUG',
-                   format='{time} {level} {message}', rotation='9:00', compression='zip')
         logger.debug('Command: {command} Name func: {func} error name: {ex}'.
                      format(command=user_dict[message.chat.id]['command'], func=chekOut_hotel.__name__, ex=ex))
 
@@ -118,8 +115,6 @@ def period_of_stay_hotel(message: telebot.types.Message, bot: telebot, user_dict
         else:
             raise Exception('date chekOut_hotel Error')
     except Exception as ex:
-        logger.add('errors id{chat_id}.log'.format(chat_id=message.chat.id), level='DEBUG',
-                   format='{time} {level} {message}', rotation='9:00', compression='zip')
         logger.debug('Command: {command} Name func: {func} error name: {ex}'.
                      format(command=user_dict[message.chat.id]['command'], func=period_of_stay_hotel.__name__, ex=ex))
 
@@ -178,8 +173,6 @@ def get_range_distance(message: telebot.types.Message, bot: telebot, user_dict: 
         else:
             raise Exception('get_range_price Error')
     except Exception as ex:
-        logger.add('errors id{chat_id}.log'.format(chat_id=message.chat.id), level='DEBUG',
-                   format='{time} {level} {message}', rotation='9:00', compression='zip')
         logger.debug('Command: {command} Name func: {func} error name: {ex}'.
                      format(command=user_dict[message.chat.id]['command'], func=get_range_distance.__name__, ex=ex))
 
@@ -203,8 +196,6 @@ def get_number_city(message: telebot.types.Message, bot: telebot, user_dict: Dic
         else:
             raise Exception('get_range_distance Error')
     except Exception as ex:
-        logger.add('errors id{chat_id}.log'.format(chat_id=message.chat.id), level='DEBUG',
-                   format='{time} {level} {message}', rotation='9:00', compression='zip')
         logger.debug('Command: {command} Name func: {func} error name: {ex}'.
                      format(command=user_dict[message.chat.id]['command'], func=get_number_city.__name__, ex=ex))
 
@@ -230,8 +221,6 @@ def get_foto(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
         else:
             raise Exception('get_number_city Error')
     except Exception as ex:
-        logger.add('errors id{chat_id}.log'.format(chat_id=message.chat.id), level='DEBUG',
-                   format='{time} {level} {message}', rotation='9:00', compression='zip')
         logger.debug('Command: {command} Name func: {func} error name: {ex}'.
                      format(command=user_dict[message.chat.id]['command'], func=get_foto.__name__, ex=ex))
 
@@ -316,8 +305,6 @@ def get_city_price_and_foto(message: telebot.types.Message, bot: telebot, user_d
             raise Exception('get_quantity_foto Error')
 
     except Exception as ex:
-        logger.add('errors id{chat_id}.log'.format(chat_id=message.chat.id), level='DEBUG',
-                   format='{time} {level} {message}', rotation='9:00', compression='zip')
         logger.debug('Command: {command} Name func: {func} error name: {ex}'.
                      format(command=user_dict[message.chat.id]['command'],
                             func=get_city_price_and_foto.__name__, ex=ex))
