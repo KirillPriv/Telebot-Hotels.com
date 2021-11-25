@@ -29,7 +29,7 @@ def start_search(bot: telebot, message: telebot.types.Message, user_dict: Dict) 
 
 
 def get_city(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
-    """Функция, котороя по названию города делает запрос на API и записывает
+    """Функция, которая по названию города делает запрос на API и записывает
     полученный результат destinationId в User_dict"""
 
     try:
@@ -68,7 +68,7 @@ def get_city(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
 
 
 def chekIn_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
-    """Функция, котороя запрашивает у пользователя дату заезда в отель"""
+    """Функция, которая запрашивает у пользователя дату заезда в отель"""
 
     bot.send_message(message.from_user.id, 'Введите дату заезда в отель через (-)\n'
                                            'Пример ввода даты: 20-11-2021')
@@ -76,7 +76,7 @@ def chekIn_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict) 
 
 
 def chekOut_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
-    """Функция, котороя запрашивает у пользователя дату выезда из отеля"""
+    """Функция, которая запрашивает у пользователя дату выезда из отеля"""
 
     try:
         if len(message.text.split('-')) == 3 and 0 < int(message.text.split('-')[0]) <= 31 \
@@ -97,7 +97,7 @@ def chekOut_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict)
 
 
 def period_of_stay_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
-    """Функция, котороя подсчитывает количесвто дней, которые пользователь проведет в отеле"""
+    """Функция, которая подсчитывает количесвто дней, которые пользователь проведет в отеле"""
 
     try:
         if len(message.text.split('-')) == 3 and 0 < int(message.text.split('-')[0]) <= 31 \
@@ -123,7 +123,7 @@ def period_of_stay_hotel(message: telebot.types.Message, bot: telebot, user_dict
 
 
 def get_hotel_info(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
-    """Функция, котороя по destinationId запрашивает на API инфомрацию по отелям
+    """Функция, которая по destinationId запрашивает на API инфомрацию по отелям
     и передает полученный результат в виде словаря hotels_dict в функцию get_number_city()"""
 
     url = 'https://hotels4.p.rapidapi.com/properties/list'
@@ -151,7 +151,7 @@ def get_hotel_info(message: telebot.types.Message, bot: telebot, user_dict: Dict
 
 
 def get_range_price(message: telebot.types.Message, hotels_dict: Dict, bot: telebot, user_dict: Dict) -> None:
-    """Функция, котороя запрашивает у пользователя диапазон стоимости проживания,
+    """Функция, которая запрашивает у пользователя диапазон стоимости проживания,
             по которому необходимо осуществлять поиск отелей"""
 
     user_dict[message.chat.id]['hotels'] = hotels_dict
@@ -161,7 +161,7 @@ def get_range_price(message: telebot.types.Message, hotels_dict: Dict, bot: tele
 
 
 def get_range_distance(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
-    """Функция, котороя запрашивает у пользователя диапазон расстояния от центра города,
+    """Функция, которая запрашивает у пользователя диапазон расстояния от центра города,
         по которому необходимо осуществлять поиск отелей"""
 
     try:
@@ -183,7 +183,7 @@ def get_range_distance(message: telebot.types.Message, bot: telebot, user_dict: 
 
 
 def get_number_city(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
-    """Функция, котороя запрашивает у пользователя количество отелей,
+    """Функция, которая запрашивает у пользователя количество отелей,
     которое необходимо вывести в чат"""
 
     try:
@@ -206,7 +206,7 @@ def get_number_city(message: telebot.types.Message, bot: telebot, user_dict: Dic
 
 
 def get_foto(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
-    """Функция, котороя запрашивает у пользователя нужно ли выводить фотографии отелей"""
+    """Функция, которая запрашивает у пользователя нужно ли выводить фотографии отелей"""
 
     try:
         if message.text.isalnum() and int(message.text) <= 25:
@@ -231,7 +231,7 @@ def get_foto(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
 
 
 def get_quantity_foto(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
-    """Функция, котороя запрашивает у пользователя количество фотографий отелей,
+    """Функция, которая запрашивает у пользователя количество фотографий отелей,
     которое необходимо вывести в чат"""
 
     bot.send_message(message.chat.id, 'Сколько фото отелей вывести\n'
