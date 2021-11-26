@@ -29,6 +29,7 @@ def start_search(bot: telebot, message: telebot.types.Message, user_dict: Dict) 
 
 
 def get_city(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
+
     """Функция, которая по названию города делает запрос на API и записывает
     полученный результат destinationId в User_dict"""
 
