@@ -123,5 +123,7 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
-/Diplom/Practice/
-/Diplom/Diplom_bot_request/__init__.py
+/src/Practice/
+/src/bot_requests/__init__.py
+
+/Diplom_practice/Practice/
