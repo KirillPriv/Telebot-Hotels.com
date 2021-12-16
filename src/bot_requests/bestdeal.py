@@ -72,7 +72,8 @@ def chekIn_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict) 
     """Функция, которая запрашивает у пользователя дату заезда в отель"""
 
     bot.send_message(message.from_user.id, 'Введите дату заезда в отель через (-)\n'
-                                           'Пример ввода даты: 20-11-2021')
+                                           'Пример ввода даты: 20-11-2021\n'
+                                           'Примечание: дата въезда не может быть меньше текущей даты')
     bot.register_next_step_handler(message, chekOut_hotel, bot, user_dict)
 
 
@@ -88,7 +89,8 @@ def chekOut_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict)
 
             user_dict[message.chat.id]['chekIn'] = message.text
             bot.send_message(message.from_user.id, 'Введите дату выезда из отеля через (-)\n'
-                                                   'Пример ввода даты: 28-11-2021')
+                                                   'Пример ввода даты: 28-11-2021\n'
+                                                   'Примечание: дата выезда должна быть выше даты въезда')
             bot.register_next_step_handler(message, period_of_stay_hotel, bot, user_dict)
         else:
             raise Exception('date chekIn_hotel Error')
