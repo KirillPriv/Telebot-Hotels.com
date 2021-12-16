@@ -1,7 +1,6 @@
 import os
 import json
 import requests
-import time
 import telebot
 
 from dotenv import load_dotenv
@@ -128,12 +127,15 @@ def get_hotel_info(message: telebot.types.Message, bot: telebot, user_dict: Dict
     """Функция, которая по destinationId запрашивает на API инфомрацию по отелям
     и передает полученный результат в виде словаря hotels_dict в функцию get_number_city()"""
 
+    date_checkIn = user_dict[message.chat.id]['chekIn']
+    date_chekOut = user_dict[message.chat.id]['chekOut']
+
     url = 'https://hotels4.p.rapidapi.com/properties/list'
     querystring = {'destinationId': user_dict[message.chat.id]['hotel_destinationId'],
                    'pageNumber': '1',
                    'pageSize': '25',
-                   'checkIn:': time.strftime('%Y-%m-%d'),
-                   'checkOut': time.strftime('%Y-%m-%d'),
+                   'checkIn:': '-'.join(reversed(date_checkIn.split('-'))),
+                   'checkOut': '-'.join(reversed(date_chekOut.split('-'))),
                    'adults1': '1',
                    'sortOrder:': 'Price',
                    'locale:': 'en_US',
