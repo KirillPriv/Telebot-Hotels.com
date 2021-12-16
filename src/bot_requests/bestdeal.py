@@ -278,7 +278,7 @@ def get_city_price_and_foto(message: telebot.types.Message, bot: telebot, user_d
                     'x-rapidapi-key': KEY_GET_HOTELS_FOTO
                 }
 
-                req_hotels_foto = requests.request('GET', url, headers=headers, params=querystring)
+                req_hotels_foto = requests.request('GET', url, headers=headers, params=querystring, timeout=10)
                 hotels_foto_dict = json.loads(req_hotels_foto.text)
 
                 total_price = float(user_dict[message.chat.id]['period_of_stay']) * \
