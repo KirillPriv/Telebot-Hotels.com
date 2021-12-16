@@ -47,7 +47,7 @@ def get_city(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
                 'x-rapidapi-key': KEY_GET_HOTELS
             }
 
-            req_hotels_2 = requests.request('GET', url, headers=headers, params=querystring)
+            req_hotels_2 = requests.request('GET', url, headers=headers, params=querystring, timeout=10)
 
             dict_hotels_id = json.loads(req_hotels_2.text)
 
@@ -101,10 +101,11 @@ def period_of_stay_hotel(message: telebot.types.Message, bot: telebot, user_dict
     """Функция, которая подсчитывает количесвто дней, которые пользователь проведет в отеле"""
 
     try:
-        if len(message.text.split('-')) == 3 and 0 < int(message.text.split('-')[0]) <= 31 \
-                and 0 < int(message.text.split('-')[1]) <= 12 and 0 < int(message.text.split('-')[2]) >= 2021:
+        user_dict[message.chat.id]['chekOut'] = message.text
 
-            user_dict[message.chat.id]['chekOut'] = message.text
+        if len(message.text.split('-')) == 3 and 0 < int(message.text.split('-')[0]) <= 31 \
+                and 0 < int(message.text.split('-')[1]) <= 12 and 0 < int(message.text.split('-')[2]) >= 2021 \
+                and user_dict[message.chat.id]['chekIn'] < user_dict[message.chat.id]['chekOut']:
 
             date_chek_in = user_dict[message.chat.id]['chekIn'].split('-')
             date_chek_out = user_dict[message.chat.id]['chekOut'].split('-')
@@ -144,7 +145,7 @@ def get_hotel_info(message: telebot.types.Message, bot: telebot, user_dict: Dict
         'x-rapidapi-key': KEY_GET_HOTELS_INFO
     }
 
-    req_hotels = requests.request('GET', url, headers=headers, params=querystring)
+    req_hotels = requests.request('GET', url, headers=headers, params=querystring, timeout=10)
     hotels = json.loads(req_hotels.text)
     hotels_dict = hotels['data']['body']['searchResults']['results']
 
@@ -229,7 +230,7 @@ def get_city_price_and_foto(message: telebot.types.Message, bot: telebot, user_d
                     'x-rapidapi-key': KEY_GET_HOTELS_FOTO
                 }
 
-                req_hotels_foto = requests.request('GET', url_4, headers=headers_4, params=querystring_4)
+                req_hotels_foto = requests.request('GET', url_4, headers=headers_4, params=querystring_4, timeout=10)
                 hotels_foto_dict = json.loads(req_hotels_foto.text)
 
                 total_price = float(user_dict[message.chat.id]['period_of_stay']) * \
