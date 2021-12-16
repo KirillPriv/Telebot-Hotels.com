@@ -2,6 +2,7 @@ import os
 import json
 import requests
 import time
+import datetime
 import telebot
 
 from datetime import date
@@ -80,7 +81,10 @@ def chekOut_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict)
 
     try:
         if len(message.text.split('-')) == 3 and 0 < int(message.text.split('-')[0]) <= 31 \
-                and 0 < int(message.text.split('-')[1]) <= 12 and 0 < int(message.text.split('-')[2]) >= 2021:
+                and 0 < int(message.text.split('-')[1]) <= 12 and 0 < int(message.text.split('-')[2]) >= 2021 \
+                and int(message.text.split('-')[0] >= time.strftime('%d-%m-%Y').split('-')[0]) \
+                and int(message.text.split('-')[1] >= time.strftime('%d-%m-%Y').split('-')[1]) \
+                and int(message.text.split('-')[2] >= time.strftime('%d-%m-%Y').split('-')[2]):
 
             user_dict[message.chat.id]['chekIn'] = message.text
             bot.send_message(message.from_user.id, 'Введите дату выезда из отеля через (-)\n'
@@ -99,12 +103,16 @@ def chekOut_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict)
 def period_of_stay_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
     """Функция, которая подсчитывает количесвто дней, которые пользователь проведет в отеле"""
 
-    try:
-        user_dict[message.chat.id]['chekOut'] = message.text
+    user_dict[message.chat.id]['chekOut'] = message.text
 
+    date_checkIn = user_dict[message.chat.id]['chekIn'].split('-')
+    date_chekOut = user_dict[message.chat.id]['chekOut'].split('-')
+
+    try:
         if len(message.text.split('-')) == 3 and 0 < int(message.text.split('-')[0]) <= 31 \
                 and 0 < int(message.text.split('-')[1]) <= 12 and 0 < int(message.text.split('-')[2]) >= 2021 \
-                and user_dict[message.chat.id]['chekIn'] < user_dict[message.chat.id]['chekOut']:
+                and datetime.datetime(int(date_chekOut[2]), int(date_chekOut[1]), int(date_chekOut[0])) > \
+                datetime.datetime(int(date_checkIn[2]), int(date_checkIn[1]), int(date_checkIn[0])):
 
             date_chek_in = user_dict[message.chat.id]['chekIn'].split('-')
             date_chek_out = user_dict[message.chat.id]['chekOut'].split('-')
@@ -127,12 +135,15 @@ def get_hotel_info(message: telebot.types.Message, bot: telebot, user_dict: Dict
     """Функция, которая по destinationId запрашивает на API инфомрацию по отелям
     и передает полученный результат в виде словаря hotels_dict в функцию get_number_city()"""
 
+    date_checkIn = user_dict[message.chat.id]['chekIn']
+    date_chekOut = user_dict[message.chat.id]['chekOut']
+
     url = 'https://hotels4.p.rapidapi.com/properties/list'
     querystring = {'destinationId': user_dict[message.chat.id]['hotel_destinationId'],
                    'pageNumber': '1',
                    'pageSize': '25',
-                   'checkIn:': time.strftime('%Y-%m-%d'),
-                   'checkOut': time.strftime('%Y-%m-%d'),
+                   'checkIn:': '-'.join(reversed(date_checkIn.split('-'))),
+                   'checkOut': '-'.join(reversed(date_chekOut.split('-'))),
                    'adults1': '1',
                    'sortOrder:': 'Price',
                    'locale:': 'en_US',
