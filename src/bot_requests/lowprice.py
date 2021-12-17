@@ -56,7 +56,7 @@ def get_city(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
                 hotel_destinationId = dict_hotels_id['suggestions'][0]['entities'][0]['destinationId']
                 user_dict[message.chat.id]['hotel_destinationId'] = hotel_destinationId
 
-                chekIn_hotel(message, bot, user_dict)
+                chek_in_hotel(message, bot, user_dict)
             else:
                 raise Exception
         else:
@@ -69,16 +69,16 @@ def get_city(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
         bot.register_next_step_handler(message, get_city, bot, user_dict)
 
 
-def chekIn_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
+def chek_in_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
     """Функция, которая запрашивает у пользователя дату заезда в отель"""
 
     bot.send_message(message.from_user.id, 'Введите дату заезда в отель через (-)\n'
                                            'Пример ввода даты: 20-11-2021\n'
                                            'Примечание: дата въезда не может быть меньше текущей даты')
-    bot.register_next_step_handler(message, chekOut_hotel, bot, user_dict)
+    bot.register_next_step_handler(message, chek_out_hotel, bot, user_dict)
 
 
-def chekOut_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
+def chek_out_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
     """Функция, которая запрашивает у пользователя дату выезда из отеля"""
 
     try:
@@ -94,13 +94,13 @@ def chekOut_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict)
                                                    'Примечание: дата выезда должна быть выше даты въезда')
             bot.register_next_step_handler(message, period_of_stay_hotel, bot, user_dict)
         else:
-            raise Exception('date chekIn_hotel Error')
+            raise Exception('date chek_in_hotel Error')
     except Exception as ex:
         logger.debug('Command: {command} Name func: {func} error name: {ex}'.
-                     format(command=user_dict[message.chat.id]['command'], func=chekOut_hotel.__name__, ex=ex))
+                     format(command=user_dict[message.chat.id]['command'], func=chek_out_hotel.__name__, ex=ex))
 
         bot.send_message(message.from_user.id, 'Дата введена некоректно, введите дату согласно интрукции')
-        bot.register_next_step_handler(message, chekOut_hotel, bot, user_dict)
+        bot.register_next_step_handler(message, chek_out_hotel, bot, user_dict)
 
 
 def period_of_stay_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
@@ -108,24 +108,22 @@ def period_of_stay_hotel(message: telebot.types.Message, bot: telebot, user_dict
 
     user_dict[message.chat.id]['chekOut'] = message.text
 
-    date_checkIn = user_dict[message.chat.id]['chekIn'].split('-')
-    date_chekOut = user_dict[message.chat.id]['chekOut'].split('-')
+    date_chek_in = user_dict[message.chat.id]['chekIn'].split('-')
+    date_chek_out = user_dict[message.chat.id]['chekOut'].split('-')
 
     try:
         if len(message.text.split('-')) == 3 and 0 < int(message.text.split('-')[0]) <= 31 \
                 and 0 < int(message.text.split('-')[1]) <= 12 and 0 < int(message.text.split('-')[2]) >= 2021 \
-                and datetime.datetime(int(date_chekOut[2]), int(date_chekOut[1]), int(date_chekOut[0])) > \
-                datetime.datetime(int(date_checkIn[2]), int(date_checkIn[1]), int(date_checkIn[0])):
+                and datetime.datetime(int(date_chek_out[2]), int(date_chek_out[1]), int(date_chek_out[0])) > \
+                datetime.datetime(int(date_chek_in[2]), int(date_chek_in[1]), int(date_chek_in[0])):
 
-            date_chek_in = user_dict[message.chat.id]['chekIn'].split('-')
-            date_chek_out = user_dict[message.chat.id]['chekOut'].split('-')
             period_of_stay = date(int(date_chek_out[2]), int(date_chek_out[1]), int(date_chek_out[0])) - \
                              date(int(date_chek_in[2]), int(date_chek_in[1]), int(date_chek_in[0]))
 
             user_dict[message.chat.id]['period_of_stay'] = period_of_stay.days
             get_hotel_info(message, bot, user_dict)
         else:
-            raise Exception('date chekOut_hotel Error')
+            raise Exception('date chek_out_hotel Error')
     except Exception as ex:
         logger.debug('Command: {command} Name func: {func} error name: {ex}'.
                      format(command=user_dict[message.chat.id]['command'], func=period_of_stay_hotel.__name__, ex=ex))
@@ -138,15 +136,15 @@ def get_hotel_info(message: telebot.types.Message, bot: telebot, user_dict) -> N
     """Функция, которая по destinationId запрашивает на API инфомрацию по отелям
     и передает полученный результат в виде словаря hotels_dict в функцию get_number_city()"""
 
-    date_checkIn = user_dict[message.chat.id]['chekIn']
-    date_chekOut = user_dict[message.chat.id]['chekOut']
+    date_chek_in = user_dict[message.chat.id]['chekIn']
+    date_chek_out = user_dict[message.chat.id]['chekOut']
 
     url = 'https://hotels4.p.rapidapi.com/properties/list'
     querystring = {'destinationId': user_dict[message.chat.id]['hotel_destinationId'],
                    'pageNumber': '1',
                    'pageSize': '25',
-                   'checkIn:': '-'.join(reversed(date_checkIn.split('-'))),
-                   'checkOut': '-'.join(reversed(date_chekOut.split('-'))),
+                   'checkIn:': '-'.join(reversed(date_chek_in.split('-'))),
+                   'checkOut': '-'.join(reversed(date_chek_out.split('-'))),
                    'adults1': '1',
                    'sortOrder:': 'Price',
                    'locale:': 'en_US',
@@ -173,10 +171,10 @@ def get_number_city(message: telebot.types.Message, hotels_dict: Dict, bot: tele
     bot.send_message(message.from_user.id, 'Сколько вывести отелей с минимальными ценами в городе {city}\n'
                                            'Примечание: Количество отелей не должно быть больше 25'.
                      format(city=user_dict[message.chat.id]['city']))
-    bot.register_next_step_handler(message, get_foto, bot, user_dict)
+    bot.register_next_step_handler(message, get_photo, bot, user_dict)
 
 
-def get_foto(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
+def get_photo(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
     """Функция, которая запрашивает у пользователя нужно ли выводить фотографии отелей"""
 
     try:
@@ -193,29 +191,29 @@ def get_foto(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
             raise Exception('get_number_city Error')
     except Exception as ex:
         logger.debug('Command: {command} Name func: {func} error name: {ex}'.
-                     format(command=user_dict[message.chat.id]['command'], func=get_foto.__name__, ex=ex))
+                     format(command=user_dict[message.chat.id]['command'], func=get_photo.__name__, ex=ex))
 
         bot.send_message(message.from_user.id, 'Введенно некорректное значение, '
                                                'либо введенное значение привышает 25\n'
                                                'Введите значение согласно интрукции (кол-во <= 25)')
-        bot.register_next_step_handler(message, get_foto, bot, user_dict)
+        bot.register_next_step_handler(message, get_photo, bot, user_dict)
 
 
-def get_quantity_foto(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
+def get_quantity_photo(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
     """Функция, которая запрашивает у пользователя количество фотографий отелей,
     которое необходимо вывести в чат"""
 
     bot.send_message(message.chat.id, 'Сколько фото отелей вывести\n'
                                       'Примечание: Количество фото не должно быть больше 10')
-    bot.register_next_step_handler(message, get_city_price_and_foto, bot, user_dict)
+    bot.register_next_step_handler(message, get_city_price_and_photo, bot, user_dict)
 
 
-def get_city_price_and_foto(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
+def get_city_price_and_photo(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
     """Основная Функция для вывода информации по выбранным отелям и фотографий к ним,
     в данной функции производится сортировка словаря по ценам, а
     также осуществляется вывод информации по отелям в чат"""
 
-    user_dict[message.chat.id]['get_foto'] = ['yes']
+    user_dict[message.chat.id]['get_photo'] = ['yes']
     hotels_dict = user_dict[message.chat.id]['hotels']
 
     try:
@@ -243,8 +241,8 @@ def get_city_price_and_foto(message: telebot.types.Message, bot: telebot, user_d
                     'x-rapidapi-key': KEY_GET_HOTELS_FOTO
                 }
 
-                req_hotels_foto = requests.request('GET', url_4, headers=headers_4, params=querystring_4, timeout=10)
-                hotels_foto_dict = json.loads(req_hotels_foto.text)
+                req_hotels_photo = requests.request('GET', url_4, headers=headers_4, params=querystring_4, timeout=10)
+                hotels_photo_dict = json.loads(req_hotels_photo.text)
 
                 total_price = float(user_dict[message.chat.id]['period_of_stay']) * \
                               round(i_hotel['ratePlan']['price']['exactCurrent'], 0)
@@ -263,29 +261,29 @@ def get_city_price_and_foto(message: telebot.types.Message, bot: telebot, user_d
                                         hotel_id=i_hotel['id']), disable_web_page_preview=True)
 
                 media_group = [InputMediaPhoto(i_foto_get['baseUrl'].format(size='z'))
-                               for i_foto_get in hotels_foto_dict['hotelImages'][:int(message.text)]]
+                               for i_foto_get in hotels_photo_dict['hotelImages'][:int(message.text)]]
                 bot.send_media_group(message.chat.id, media_group)
 
                 write_history(i_hotel, message, total_price)
         else:
-            raise Exception('get_quantity_foto Error')
+            raise Exception('get_quantity_photo Error')
     except Exception as ex:
         logger.debug('Command: {command} Name func: {func} error name: {ex}'.
                      format(command=user_dict[message.chat.id]['command'],
-                            func=get_city_price_and_foto.__name__, ex=ex))
+                            func=get_city_price_and_photo.__name__, ex=ex))
 
         bot.send_message(message.from_user.id, 'Введенно некорректное значение, '
                                                'либо введенное значение привышает 10\n'
                                                'Введите значение согласно интрукции (кол-во фото <= 10)')
-        bot.register_next_step_handler(message, get_city_price_and_foto, bot, user_dict)
+        bot.register_next_step_handler(message, get_city_price_and_photo, bot, user_dict)
 
 
-def get_city_price_none_foto(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
+def get_city_price_none_photo(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
     """Основная Функция для вывода информации по выбранным отелям без фотографий,
        в данной функции производится сортировка словаря по ценам, а
        также осуществляется вывод информации по отелям в чат"""
 
-    user_dict[message.chat.id]['get_foto'] = ['no']
+    user_dict[message.chat.id]['get_photo'] = ['no']
     hotels_dict = user_dict[message.chat.id]['hotels']
 
     def filter_key(hotel_dict):
