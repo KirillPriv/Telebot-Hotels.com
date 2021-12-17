@@ -48,7 +48,7 @@ def get_city(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
                 'x-rapidapi-key': KEY_GET_HOTELS
             }
 
-            req_hotels_2 = requests.request('GET', url, headers=headers, params=querystring, timeout=10)
+            req_hotels_2 = requests.request('GET', url, headers=headers, params=querystring, timeout=30)
             dict_hotels_id = json.loads(req_hotels_2.text)
 
             if dict_hotels_id['moresuggestions'] != 0:
@@ -155,11 +155,18 @@ def get_hotel_info(message: telebot.types.Message, bot: telebot, user_dict: Dict
         'x-rapidapi-key': KEY_GET_HOTELS_INFO
     }
 
-    req_hotels = requests.request('GET', url, headers=headers, params=querystring, timeout=10)
-    hotels = json.loads(req_hotels.text)
-    hotels_dict = hotels['data']['body']['searchResults']['results']
+    req_hotels = requests.request('GET', url, headers=headers, params=querystring, timeout=30)
+    try:
+        hotels = json.loads(req_hotels.text)
+        hotels_dict = hotels['data']['body']['searchResults']['results']
 
-    get_range_price(message, hotels_dict, bot, user_dict)
+        get_range_price(message, hotels_dict, bot, user_dict)
+    except Exception as ex:
+        logger.debug('Command: {command} Name func: {func} error name: {ex}'.
+                     format(command=user_dict[message.chat.id]['command'], func=get_hotel_info.__name__, ex=ex))
+
+        bot.send_message(message.from_user.id, 'Ответ сервера некорректен, начните запрос по команде заново!')
+        start_search(bot, message, user_dict)
 
 
 def get_range_price(message: telebot.types.Message, hotels_dict: Dict, bot: telebot, user_dict: Dict) -> None:
@@ -289,7 +296,7 @@ def get_city_price_and_photo(message: telebot.types.Message, bot: telebot, user_
                     'x-rapidapi-key': KEY_GET_HOTELS_FOTO
                 }
 
-                req_hotels_photo = requests.request('GET', url, headers=headers, params=querystring, timeout=10)
+                req_hotels_photo = requests.request('GET', url, headers=headers, params=querystring, timeout=30)
                 hotels_photo_dict = json.loads(req_hotels_photo.text)
 
                 total_price = float(user_dict[message.chat.id]['period_of_stay']) * \
