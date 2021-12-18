@@ -28,6 +28,9 @@ def get_start_message(message: telebot.types.Message) -> None:
                                                "/bestdeal - вывод отелей по заданным параметрам цена и удаленность от центра\n"
                                                "/history - вывод истории запросов\n")
         bot.register_next_step_handler(message, get_comannd_message)
+    elif message.text == '/lowprice' or message.text == '/highprice' or message.text == '/bestdeal' \
+            or message.text == '/history':
+        get_comannd_message(message)
     else:
         bot.send_message(message.from_user.id, 'Я тебя не понимаю. Напиши /help.')
         bot.register_next_step_handler(message, get_comannd_message)
