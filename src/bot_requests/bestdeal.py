@@ -4,6 +4,7 @@ import requests
 import time
 import datetime
 import telebot
+import re
 
 from datetime import date
 from dotenv import load_dotenv
@@ -51,13 +52,34 @@ def get_city(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
             req_hotels_2 = requests.request('GET', url, headers=headers, params=querystring, timeout=30)
             dict_hotels_id = json.loads(req_hotels_2.text)
 
-            if dict_hotels_id['moresuggestions'] != 0:
-                hotel_destinationId = dict_hotels_id['suggestions'][0]['entities'][0]['destinationId']
-                user_dict[message.chat.id]['hotel_destinationId'] = hotel_destinationId
+            result_city = [re.findall(r'\w+', i_town['caption']) if '<span' in i_town['caption']
+                           else i_town['caption']
+                           for i_town in dict_hotels_id['suggestions'][0]['entities']]
+            for word_list in result_city:
+                if 'span' in word_list and 'class' in word_list and 'highlighted' in word_list:
+                    word_list.remove('span')
+                    word_list.remove('class')
+                    word_list.remove('span')
+                    word_list.remove('highlighted')
 
-                chek_in_hotel(message, bot, user_dict)
+            if dict_hotels_id['moresuggestions'] != 0:
+                user_dict[message.chat.id]['dict_town'] = dict_hotels_id
+                with open('User_dict {chat_id}.json'.format(chat_id=message.chat.id), 'w') as file:
+                    json.dump(user_dict, file, indent=4)
+
+                keyboard = types.InlineKeyboardMarkup()
+                if len(dict_hotels_id['suggestions'][0]['entities']) > 0:
+                    for i_index in range(0, len(dict_hotels_id['suggestions'][0]['entities'])):
+                        keyboard.add(types.InlineKeyboardButton(text='{city_name}'.
+                                                                format(city_name=result_city[i_index]),
+                                                                callback_data=str(i_index)))
+                else:
+                    raise Exception('len(dict_hotels_id[suggestions][0][entities]) == 0')
+
+                question = 'Уточните пожалуйста город из списка, в котором осуществляем поиск?'
+                bot.send_message(message.from_user.id, text=question, reply_markup=keyboard)
             else:
-                raise Exception
+                raise Exception('moresuggestions == 0')
         else:
             raise Exception
     except Exception as ex:
@@ -71,7 +93,7 @@ def get_city(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> N
 def chek_in_hotel(message: telebot.types.Message, bot: telebot, user_dict: Dict) -> None:
     """Функция, которая запрашивает у пользователя дату заезда в отель"""
 
-    bot.send_message(message.from_user.id, 'Введите дату заезда в отель через (-)\n'
+    bot.send_message(message.chat.id, 'Введите дату заезда в отель через (-)\n'
                                            'Пример ввода даты: 20-11-2021\n'
                                            'Примечание: дата въезда не может быть меньше текущей даты')
     bot.register_next_step_handler(message, chek_out_hotel, bot, user_dict)
