@@ -104,12 +104,23 @@ def callback_worker(call) -> None:
             highprice.get_quantity_photo(call.message, bot, user_dict)
         elif user_dict[call.message.chat.id]['command'] == '/bestdeal':
             bestdeal.get_quantity_photo(call.message, bot, user_dict)
-    else:
+    elif call.data == "no":
         if user_dict[call.message.chat.id]['command'] == '/lowprice':
             lowprice.get_city_price_none_photo(call.message, bot, user_dict)
         elif user_dict[call.message.chat.id]['command'] == '/highprice':
             highprice.get_city_price_none_photo(call.message, bot, user_dict)
         elif user_dict[call.message.chat.id]['command'] == '/bestdeal':
             bestdeal.get_city_price_none_photo(call.message, bot, user_dict)
+
+    elif int(call.data) <= 20:
+        hotel_destinationId = user_dict[call.message.chat.id]['dict_town']['suggestions'][0]['entities'][int(call.data)]['destinationId']
+        user_dict[call.message.chat.id]['hotel_destinationId'] = hotel_destinationId
+        if user_dict[call.message.chat.id]['command'] == '/lowprice':
+            lowprice.chek_in_hotel(call.message, bot, user_dict)
+        elif user_dict[call.message.chat.id]['command'] == '/highprice':
+            highprice.chek_in_hotel(call.message, bot, user_dict)
+        elif user_dict[call.message.chat.id]['command'] == '/bestdeal':
+            bestdeal.chek_in_hotel(call.message, bot, user_dict)
+
 
 bot.polling(none_stop=True, interval=0)
